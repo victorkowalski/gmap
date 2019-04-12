@@ -1,0 +1,16 @@
+gradlew.bat
+gradlew
+gradle.properties
+*.iml
+.gradle
+/gradle
+/.idea
+/local.properties
+/.idea/caches/build_file_checksums.ser
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
