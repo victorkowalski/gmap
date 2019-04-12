@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.*
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -16,7 +17,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class MapsActivity : AppCompatActivity(), OnMapAndViewReadyListener.OnGlobalLayoutAndMapReadyListener {
+class MapsActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,OnMapAndViewReadyListener.OnGlobalLayoutAndMapReadyListener {
 
     private lateinit var map: GoogleMap
     /** map to store place names and locations */
@@ -210,6 +211,12 @@ class MapsActivity : AppCompatActivity(), OnMapAndViewReadyListener.OnGlobalLayo
             })
         }*/
     }
+
+    override fun onMarkerClick(marker : Marker): Boolean {
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+
+    }
 }
 
 
@@ -225,3 +232,19 @@ class PlaceDetails(
     val infoWindowAnchorY: Float = 0F,
     val draggable: Boolean = false,
     val zIndex: Float = 0F)
+
+//*****************************************
+/*
+LayoutInflater inflater = LayoutInflater.from(this);
+final Dialog dialog1 = new Dialog(this);
+Window window = dialog1.getWindow();
+WindowManager.LayoutParams wlp = window.getAttributes();
+wlp.gravity = Gravity.BOTTOM; // Here you can set window top or bottom
+wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+window.setAttributes(wlp);
+View view1 = inflater.inflate(R.layout.openYourWindow, null);
+dialog1.requestWindowFeature(Window.FEATURE_NO_TITLE);
+dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+dialog1.setContentView(view1);
+dialog1.show();
+ */
