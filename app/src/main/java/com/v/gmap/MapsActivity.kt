@@ -3,6 +3,8 @@ package com.v.gmap
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.BottomSheetBehavior
+import android.support.v4.widget.NestedScrollView
 import android.util.Log
 import android.view.*
 
@@ -12,6 +14,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.v.gmap.service.ApiFactory
+import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -26,12 +29,21 @@ class MapsActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,OnMapA
         "MELBOURNE" to LatLng(-37.81319, 144.96298)
     )
 
+    private var mBottomSheetBehavior1: BottomSheetBehavior<NestedScrollView>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         OnMapAndViewReadyListener(mapFragment, this)
+
+        mBottomSheetBehavior1 = BottomSheetBehavior.from(bottom_sheet1)
+        //mBottomSheetBehavior1?.setPeekHeight(0);
+        //mBottomSheetBehavior1?.setHideable(true) //Important to add
+        mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_HIDDEN); //Important to add
+
+
     }
 
     override fun onMapReady(googleMap: GoogleMap?) {
@@ -87,7 +99,7 @@ class MapsActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,OnMapA
             //setInfoWindowAdapter(CustomInfoWindowAdapter())
 
             // Set listeners for marker events.  See the bottom of this class for their behavior.
-            //setOnMarkerClickListener(this@MarkerDemoActivity)
+            setOnMarkerClickListener(this@MapsActivity)
 
             //setOnInfoWindowClickListener(this@MarkerDemoActivity)
             //setOnMarkerDragListener(this@MarkerDemoActivity)
@@ -214,8 +226,15 @@ class MapsActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,OnMapA
 
     override fun onMarkerClick(marker : Marker): Boolean {
 
-        LayoutInflater inflater = LayoutInflater.from(this);
-
+        if(mBottomSheetBehavior1?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+            mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_EXPANDED);
+            //mButton1.setText(R.string.collapse_button1);
+        }
+        else {
+            mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            //mButton1.setText(R.string.button1);STATE_HIDDEN
+        }
+return true
     }
 }
 
