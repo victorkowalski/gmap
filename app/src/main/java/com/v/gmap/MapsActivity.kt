@@ -1,6 +1,7 @@
 package com.v.gmap
 
 import android.graphics.Color
+import android.graphics.Rect
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
@@ -19,6 +20,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.lang.Exception
+import android.view.MotionEvent
+
 
 class MapsActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,OnMapAndViewReadyListener.OnGlobalLayoutAndMapReadyListener {
 
@@ -224,17 +227,38 @@ class MapsActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,OnMapA
         }*/
     }
 
-    override fun onMarkerClick(marker : Marker): Boolean {
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            if (mBottomSheetBehavior1?.getState() === BottomSheetBehavior.STATE_EXPANDED) {
 
-        if(mBottomSheetBehavior1?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                val outRect = Rect()
+                bottom_sheet1.getGlobalVisibleRect(outRect)
+
+                if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt()))
+                    mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_COLLAPSED)
+            }
+        }
+
+        return super.dispatchTouchEvent(event)
+    }
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+
+        if (mBottomSheetBehavior1?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+            mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_EXPANDED)
+        } else if (mBottomSheetBehavior1?.getState() == BottomSheetBehavior.STATE_EXPANDED){
+            mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_COLLAPSED)
+            mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_EXPANDED)
+        }
+/*
+        if (mBottomSheetBehavior1?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
             mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_EXPANDED);
             //mButton1.setText(R.string.collapse_button1);
-        }
-        else {
+        } else {
             mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_COLLAPSED);
             //mButton1.setText(R.string.button1);STATE_HIDDEN
-        }
-return true
+        }*/
+        return true
     }
 }
 
