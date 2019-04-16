@@ -1,0 +1,38 @@
+[
+    {
+        "id": "e8490293-25a7-4954-80f8-85b8cb769bdb",
+        "coordinates": {
+            "lat": 37.420819,
+            "lng": -122.085259
+        },
+        "connector_statuses": {
+            "available": 1,
+            "busy": 0,
+            "out_of_use": 0
+        }
+    },
+    {
+        "id": "830f7bde-5836-4424-a374-32ec80c654aa",
+        "coordinates": {
+            "lat": 37.421758,
+            "lng": -122.085306
+        },
+        "connector_statuses": {
+            "available": 1,
+            "busy": 0,
+            "out_of_use": 0
+        }
+    },
+    {
+        "id": "afc4db56-f3d1-4b41-890b-7ecd7dc6cec9",
+        "coordinates": {
+            "lat": 37.4219983,
+            "lng": -122.084
+        },
+        "connector_statuses": {
+            "available": 3,
+            "busy": 0,
+            "out_of_use": 1
+        }
+    }
+]

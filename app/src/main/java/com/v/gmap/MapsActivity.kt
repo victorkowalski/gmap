@@ -21,11 +21,17 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.lang.Exception
 import android.view.MotionEvent
+import com.v.gmap.data.Locations
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+
+
 
 
 class MapsActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,OnMapAndViewReadyListener.OnGlobalLayoutAndMapReadyListener {
 
     private lateinit var map: GoogleMap
+    private var locations = ArrayList<com.v.gmap.data.Locations>()
     /** map to store place names and locations */
     private val places = mapOf(
         "BRISBANE" to LatLng(37.420819,-122.085259),
@@ -43,18 +49,24 @@ class MapsActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,OnMapA
 
         mBottomSheetBehavior1 = BottomSheetBehavior.from(bottom_sheet1)
         //mBottomSheetBehavior1?.setPeekHeight(0);
-        //mBottomSheetBehavior1?.setHideable(true) //Important to add
-        mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_HIDDEN); //Important to add
+        //mBottomSheetBehavior1?.setHideable(true)
+        mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_HIDDEN)
+        //getLocations()
+        val json = intent.getStringExtra("LOCATIONS")
+        val gson = Gson()
 
-
+        locations = Gson().fromJson<ArrayList<com.v.gmap.data.Locations>>(json, com.v.gmap.data.Location::class.java!!)
+        Log.d("MainActivity ","response.errorBody().toString()")
+        //val things = Gson().fromJson<ArrayList<com.v.gmap.data.Locations>>(json, com.v.gmap.data.Location!!)
     }
-
-    override fun onMapReady(googleMap: GoogleMap?) {
+/*
+    private fun getLocations(){
         var mode = "short"
         var ne_lat = "37.44446960614344"
         var ne_lng = "-122.06634320318699"
         var sw_lat = "37.3995197602049"
         var sw_lng = "-122.10165616124867"
+        //val places = mapOf<String, LatLng>()
 
         val locationsService = ApiFactory.locations
         GlobalScope.launch(Dispatchers.Main) {
@@ -63,7 +75,20 @@ class MapsActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,OnMapA
             )
             try {
                 val response = locationsRequest.await()
-                Log.d("MainActivity ","response.errorBody().toString()")
+                this@MapsActivity.locations = response as ArrayList<Locations>
+                //test
+                /*
+                response.forEach { place ->
+                    Log.d("place", place.coordinates.lat.toString())
+                    Log.d("place", place.coordinates.lng.toString())
+
+                }
+                response.forEach { place ->
+                    boundsBuilder.include(LatLng(place.coordinates.lat, place.coordinates.lng))
+                    Log.d("MainActivity ","response.errorBody().toString()")
+                }*/
+
+
                 /*if(response.isSuccessful){
                     val movieResponse = response.body() //This is single object Tmdb Movie response
                     val popularMovies = movieResponse?.results // This is list of TMDB Movie
@@ -71,223 +96,182 @@ class MapsActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,OnMapA
                     Log.d("MainActivity ",response.errorBody().toString())
                 }*/
             }catch (e: Exception){
-
+                Log.d("MainActivity ","response.errorBody().toString()")
             }
         }
+    }
+*/
+    override fun onMapReady(googleMap: GoogleMap?) {
 
         // return early if the map was not initialised properly
         map = googleMap ?: return
 
         // create bounds that encompass every location we reference
         val boundsBuilder = LatLngBounds.Builder()
-        // include all places we have markers for on the map
-        //test
-        places.keys.map { place ->
-            places.getValue(place)
-            Log.d("place", place)
-        }
 
-        places.keys.map { place -> boundsBuilder.include(places.getValue(place)) }
 
-        //val sydney = LatLng(-34.0, 151.0)
 
-        val bounds = boundsBuilder.build()
 
-        with(map) {
-            // Hide the zoom controls as the button panel will cover it.
-            uiSettings.isZoomControlsEnabled = true
-
-            // Setting an info window adapter allows us to change the both the contents and
-            // look of the info window.
-            //setInfoWindowAdapter(CustomInfoWindowAdapter())
-
-            // Set listeners for marker events.  See the bottom of this class for their behavior.
-            setOnMarkerClickListener(this@MapsActivity)
-
-            //setOnInfoWindowClickListener(this@MarkerDemoActivity)
-            //setOnMarkerDragListener(this@MarkerDemoActivity)
-            //setOnInfoWindowCloseListener(this@MarkerDemoActivity)
-            //setOnInfoWindowLongClickListener(this@MarkerDemoActivity)
-
-            // Override the default content description on the view, for accessibility mode.
-            // Ideally this string would be localised.
-            setContentDescription("Map with lots of markers.")
-
-            moveCamera(com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, 250))
-        }
-
-        // Add lots of markers to the googleMap.
-        addMarkersToMap()
-
-    }
-
-    /**
-     * Show all the specified markers on the map
-     */
-    private fun addMarkersToMap() {
-
-        val placeDetailsMap = mutableMapOf(
-            // Uses a coloured icon
-            "BRISBANE" to PlaceDetails(
-                position = places.getValue("BRISBANE"),
-                title = "Brisbane",
-                snippet = "Population: 2,074,200",
-                icon = BitmapDescriptorFactory
-                    .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
-            ),
-
-            // Uses a custom icon with the info window popping out of the center of the icon.
-  /*          "SYDNEY" to PlaceDetails(
-                position = places.getValue("SYDNEY"),
-                title = "Sydney",
-                snippet = "Population: 4,627,300",
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.arrow),
-                infoWindowAnchorX = 0.5f,
-                infoWindowAnchorY = 0.5f
-            ),
+      // include all places we have markers for on the map
+      //test
+/*      places.keys.map { place ->
+          places.getValue(place)
+          Log.d("place", place)
+      }
 */
-            // Will create a draggable marker. Long press to drag.
-            "MELBOURNE" to PlaceDetails(
-                position = places.getValue("MELBOURNE"),
-                title = "Melbourne",
-                snippet = "Population: 4,137,400",
-                draggable = true
-            )
+        locations.forEach { place ->
+            boundsBuilder.include(LatLng(place.coordinates.lat, place.coordinates.lng))
+            Log.d("MainActivity ","response.errorBody().toString()")
+        }
+      //places.keys.map { place -> boundsBuilder.include(places.getValue(place)) }
 
-            // Use a vector drawable resource as a marker icon.
-  /*          "ALICE_SPRINGS" to PlaceDetails(
-                position = places.getValue("ALICE_SPRINGS"),
-                title = "Alice Springs",
-                icon = vectorToBitmap(
-                    R.drawable.ic_android, Color.parseColor("#A4C639"))
-            ),
+      //val sydney = LatLng(-34.0, 151.0)
+
+      val bounds = boundsBuilder.build()
+
+      with(map) {
+          // Hide the zoom controls as the button panel will cover it.
+          uiSettings.isZoomControlsEnabled = true
+
+          // Setting an info window adapter allows us to change the both the contents and
+          // look of the info window.
+          //setInfoWindowAdapter(CustomInfoWindowAdapter())
+
+          // Set listeners for marker events.  See the bottom of this class for their behavior.
+          setOnMarkerClickListener(this@MapsActivity)
+
+          //setOnInfoWindowClickListener(this@MarkerDemoActivity)
+          //setOnMarkerDragListener(this@MarkerDemoActivity)
+          //setOnInfoWindowCloseListener(this@MarkerDemoActivity)
+          //setOnInfoWindowLongClickListener(this@MarkerDemoActivity)
+
+          // Override the default content description on the view, for accessibility mode.
+          // Ideally this string would be localised.
+          setContentDescription("Map with lots of markers.")
+
+          moveCamera(com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, 50))
+      }
+
+      // Add lots of markers to the googleMap.
+      addMarkersToMap()
+
+  }
+
+  /**
+   * Show all the specified markers on the map
+   */
+  private fun addMarkersToMap() {
+
+      val placeDetailsMap = mutableMapOf(
+          // Uses a coloured icon
+          "BRISBANE" to PlaceDetails(
+              position = places.getValue("BRISBANE"),
+              title = "Brisbane",
+              snippet = "Population: 2,074,200",
+              icon = BitmapDescriptorFactory
+                  .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
+          ),
+
+          // Will create a draggable marker. Long press to drag.
+          "MELBOURNE" to PlaceDetails(
+              position = places.getValue("MELBOURNE"),
+              title = "Melbourne",
+              snippet = "Population: 4,137,400",
+              draggable = true
+          )
+
+          // Use a vector drawable resource as a marker icon.
+/*          "ALICE_SPRINGS" to PlaceDetails(
+              position = places.getValue("ALICE_SPRINGS"),
+              title = "Alice Springs",
+              icon = vectorToBitmap(
+                  R.drawable.ic_android, Color.parseColor("#A4C639"))
+          ),
 */
-            // More markers for good measure
-  /*
-            "PERTH" to PlaceDetails(
-                position = places.getValue("PERTH"),
-                title = "Perth",
-                snippet = "Population: 1,738,800"
-            ),
-
-            "ADELAIDE" to PlaceDetails(
-                position = places.getValue("ADELAIDE"),
-                title = "Adelaide",
-                snippet = "Population: 1,213,000"
-            )
-*/
-        )
-
-        // add 4 markers on top of each other in Darwin with varying z-indexes
-        /*
-        (0 until 4).map {
-            placeDetailsMap.put(
-                "DARWIN ${it + 1}", PlaceDetails(
-                    position = places.getValue("DARWIN"),
-                    title = "Darwin Marker ${it + 1}",
-                    snippet = "z-index initially ${it + 1}",
-                    zIndex = it.toFloat()
-                )
-            )
-        }
-        */
-
-        // place markers for each of the defined locations
-        placeDetailsMap.keys.map {
-            with(placeDetailsMap.getValue(it)) {
-                map.addMarker(
-                    com.google.android.gms.maps.model.MarkerOptions()
-                        .position(position)
-                        .title(title)
-                        .snippet(snippet)
-                        .icon(icon)
-                        .infoWindowAnchor(infoWindowAnchorX, infoWindowAnchorY)
-                        .draggable(draggable)
-                        .zIndex(zIndex))
-
-            }
-        }
-
-        // Creates a marker rainbow demonstrating how to create default marker icons of different
-        // hues (colors).
-       /*
-        val numMarkersInRainbow = 12
-        (0 until numMarkersInRainbow).mapTo(markerRainbow) {
-            map.addMarker(MarkerOptions().apply{
-                position(LatLng(
-                    -30 + 10 * Math.sin(it * Math.PI / (numMarkersInRainbow - 1)),
-                    135 - 10 * Math.cos(it * Math.PI / (numMarkersInRainbow - 1))))
-                title("Marker $it")
-                icon(
-                    BitmapDescriptorFactory.defaultMarker((it * 360 / numMarkersInRainbow)
-                        .toFloat()))
-                flat(flatBox.isChecked)
-                rotation(rotationBar.progress.toFloat())
-            })
-        }*/
-    }
-
-    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            if (mBottomSheetBehavior1?.getState() === BottomSheetBehavior.STATE_EXPANDED) {
-
-                val outRect = Rect()
-                bottom_sheet1.getGlobalVisibleRect(outRect)
-
-                if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt()))
-                    mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_COLLAPSED)
-            }
-        }
-
-        return super.dispatchTouchEvent(event)
-    }
-
-    override fun onMarkerClick(marker: Marker): Boolean {
-
-        if (mBottomSheetBehavior1?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-            mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_EXPANDED)
-        } else if (mBottomSheetBehavior1?.getState() == BottomSheetBehavior.STATE_EXPANDED){
-            mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_COLLAPSED)
-            mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_EXPANDED)
-        }
+          // More markers for good measure
 /*
-        if (mBottomSheetBehavior1?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-            mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_EXPANDED);
-            //mButton1.setText(R.string.collapse_button1);
-        } else {
-            mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            //mButton1.setText(R.string.button1);STATE_HIDDEN
-        }*/
-        return true
-    }
+          "PERTH" to PlaceDetails(
+              position = places.getValue("PERTH"),
+              title = "Perth",
+              snippet = "Population: 1,738,800"
+          ),
+
+          "ADELAIDE" to PlaceDetails(
+              position = places.getValue("ADELAIDE"),
+              title = "Adelaide",
+              snippet = "Population: 1,213,000"
+          )
+*/
+      )
+
+      // add 4 markers on top of each other in Darwin with varying z-indexes
+      /*
+      (0 until 4).map {
+          placeDetailsMap.put(
+              "DARWIN ${it + 1}", PlaceDetails(
+                  position = places.getValue("DARWIN"),
+                  title = "Darwin Marker ${it + 1}",
+                  snippet = "z-index initially ${it + 1}",
+                  zIndex = it.toFloat()
+              )
+          )
+      }
+      */
+
+      // place markers for each of the defined locations
+      placeDetailsMap.keys.map {
+          with(placeDetailsMap.getValue(it)) {
+              map.addMarker(
+                  com.google.android.gms.maps.model.MarkerOptions()
+                      .position(position)
+                      .title(title)
+                      .snippet(snippet)
+                      .icon(icon)
+                      .infoWindowAnchor(infoWindowAnchorX, infoWindowAnchorY)
+                      .draggable(draggable)
+                      .zIndex(zIndex))
+
+          }
+      }
+  }
+
+  override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+      if (event.action == MotionEvent.ACTION_DOWN) {
+          if (mBottomSheetBehavior1?.getState() === BottomSheetBehavior.STATE_EXPANDED) {
+
+              val outRect = Rect()
+              bottom_sheet1.getGlobalVisibleRect(outRect)
+
+              if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt()))
+                  mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_COLLAPSED)
+          }
+      }
+
+      return super.dispatchTouchEvent(event)
+  }
+
+  override fun onMarkerClick(marker: Marker): Boolean {
+
+      if (mBottomSheetBehavior1?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+          mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_EXPANDED)
+      } else if (mBottomSheetBehavior1?.getState() == BottomSheetBehavior.STATE_EXPANDED){
+          mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_COLLAPSED)
+          mBottomSheetBehavior1?.setState(BottomSheetBehavior.STATE_EXPANDED)
+      }
+      return true
+  }
 }
 
 
 /**
- * This stores the details of a place that used to draw a marker
- */
+* This stores the details of a place that used to draw a marker
+*/
 class PlaceDetails(
-    val position: LatLng,
-    val title: String = "Marker",
-    val snippet: String? = null,
-    val icon: BitmapDescriptor = BitmapDescriptorFactory.defaultMarker(),
-    val infoWindowAnchorX: Float = 0.5F,
-    val infoWindowAnchorY: Float = 0F,
-    val draggable: Boolean = false,
-    val zIndex: Float = 0F)
-
-//*****************************************
-/*
-LayoutInflater inflater = LayoutInflater.from(this);
-final Dialog dialog1 = new Dialog(this);
-Window window = dialog1.getWindow();
-WindowManager.LayoutParams wlp = window.getAttributes();
-wlp.gravity = Gravity.BOTTOM; // Here you can set window top or bottom
-wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-window.setAttributes(wlp);
-View view1 = inflater.inflate(R.layout.openYourWindow, null);
-dialog1.requestWindowFeature(Window.FEATURE_NO_TITLE);
-dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-dialog1.setContentView(view1);
-dialog1.show();
- */
+  val position: LatLng,
+  val title: String = "Marker",
+  val snippet: String? = null,
+  val icon: BitmapDescriptor = BitmapDescriptorFactory.defaultMarker(),
+  val infoWindowAnchorX: Float = 0.5F,
+  val infoWindowAnchorY: Float = 0F,
+  val draggable: Boolean = false,
+  val zIndex: Float = 0F)
