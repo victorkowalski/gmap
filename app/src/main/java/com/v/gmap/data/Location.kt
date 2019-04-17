@@ -1,12 +1,13 @@
 package com.v.gmap.data
 
 data class Location(
-    val avatar: Any,
+    val country: String,
     val city: String,
-    val company_name: String,
+    val company_name: String
+/*
     val connectors: List<Connector>,
     val coordinates: Coordinates,
-    val country: String,
+    val avatar: Any,
     val created_at: String,
     val id: String,
     val intervals: Intervals,
@@ -16,5 +17,5 @@ data class Location(
     val photos: List<Photo>,
     val postcode: String,
     val rating: Int,
-    val street: String
+    val street: String*/
 )
